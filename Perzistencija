@@ -38,3 +38,165 @@ System.out.println("Unesite opciju:\n1. Prikaz svih zaposlenih\n2. Prikaz zaposl
         }
    }
 }
+
+Metode:
+package javaapplication87;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Metode {
+    public Connection connection() throws SQLException{
+    Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/zadatakzaposleni","root","");
+        return conn;
+}
+    Scanner s = new Scanner(System.in);
+    Podaci p = new Podaci();
+    
+public void prikazZaposlenih() throws SQLException{
+    p = null;
+    List <Podaci> licniPodaci=new ArrayList <>();
+    PreparedStatement st = connection().prepareStatement("select * from zaposleni");
+    ResultSet rs = st.executeQuery();
+    System.out.println("ID  Ime i Prezime  Adesa  Starost  Visina plate");
+    System.out.println("********************************************");
+       while (rs.next()) {
+           p = new Podaci();
+           p.id         =rs.getInt("id");
+           p.ime        = rs.getString("ime");
+           p.starost    = rs.getInt("starost");
+           p.adresa     = rs.getString("adresa");
+           p.plata      = rs.getInt("plata");
+       licniPodaci.add(p);
+       System.out.println(p);
+       }
+       connection().close();
+} 
+   
+public void prikazPoKriterijumu() throws SQLException{
+    PreparedStatement st;
+    ResultSet rs = null;
+    int opcija = s.nextInt(); 
+    
+    switch(opcija){
+        case 1:
+        System.out.println("Zaposleni sa platom vecom od: ");
+        int plataVeca = s.nextInt();
+        st = connection().prepareStatement("select * from zaposleni where plata > " + plataVeca);
+        rs = st.executeQuery();
+        System.out.println("Imena zaposlenih koji imaju platu vecu od "+plataVeca+" RSD su");
+        break;
+        
+        case 2:
+        System.out.println("Zaposleni sa platom manjom od: ");
+        int plataManja = s.nextInt();
+        st = connection().prepareStatement("select * from zaposleni where plata < " + plataManja);
+        rs = st.executeQuery();
+        System.out.println("Imena zaposlenih koji imaju platu manju od "+plataManja+" RSD su");
+        break;
+        
+        default:
+        System.out.println("Pogresna opcija!!!");
+        break;
+    }
+       while (rs.next()) {
+           p = new Podaci();
+           p.ime        = rs.getString("ime");
+           System.out.println(p.ime);
+       }
+       connection().close();    
+} 
+public void izmenaPodataka() throws SQLException{
+    System.out.println("Izmena podataka o plati se vrsi na osnovu odabira zaposlenog po Id-u.");
+        try (Connection conn = connection()) {
+            PreparedStatement st = conn.prepareStatement("update zaposleni set plata= ? where id = ?");
+            System.out.println("Id zaposlenog");
+            p.id = s.nextInt();
+            System.out.println("Novi iznos plate");
+            p.plata = s.nextInt();
+            st.setInt(1, p.plata);
+            st.setInt(2, p.id);
+            st.execute();
+        }
+ }
+ 
+public void brisanjeZaposlenih() throws SQLException{
+    Connection conn = connection();
+    PreparedStatement st = conn.prepareStatement("delete from zaposleni where id = ?");
+    System.out.println("Obrisi iz baze podataka osobu sa id-em");
+    p.id = s.nextInt();
+    st.setInt(1, p.id);
+    st.execute();
+    //resetovanje id-a, nista bitno, samo se pri testiranju prave se velike praznine izmedju 2 uzastopna id-a, pr. 3 pa sledeci 10
+    //i to na kraju ispade nekako ruzno
+    PreparedStatement ps = conn.prepareStatement("ALTER TABLE `zaposleni` DROP `id`");
+    ps.executeUpdate();
+    PreparedStatement sp = conn.prepareStatement("ALTER TABLE `zaposleni` ADD  `id` INT(50) NOT NULL AUTO_INCREMENT FIRST ,ADD PRIMARY KEY (`id`)");
+    sp.executeUpdate();    
+    } 
+public void unosNovih() throws SQLException{
+ p = new Podaci();
+ System.out.println("Unesite adresu");
+ p.adresa = s.nextLine();
+ System.out.println("Unesite ime i prezime");
+ p.ime = s.nextLine();
+ System.out.println("Unesite starost");
+ p.starost = s.nextInt();
+ System.out.println("Unesite platu");
+ p.plata = s.nextInt();
+ //p = new Podaci();
+   
+Connection conn = connection();
+PreparedStatement ps = conn.prepareStatement("insert into zaposleni (ime, adresa, starost, plata) values (?,?,?,?)");
+ps.setString(1, p.ime);
+ps.setString(2, p.adresa);
+ps.setInt(3, p.starost);
+ps.setInt(4, p.plata);
+ps.execute();
+System.out.println("Unos uspešno izvršen");
+connection().close();
+}    
+}
+
+package javaapplication87;
+
+import java.util.Scanner;
+
+public class Podaci {
+    public int id;
+    public String ime;
+    public String adresa;
+    public int starost;
+    public int plata;
+    
+@Override
+    public String toString(){
+    return  id +"  "+ime +"  "+adresa+"  "+ starost+"  "+ plata;
+    } 
+/*    
+Scanner s = new Scanner(System.in);
+
+ public void ime(){
+ System.out.println("Unesite adresu");
+ this.adresa = s.nextLine();
+ System.out.println("Unesite ime i prezime");
+ this.ime = s.nextLine();
+ System.out.println("Unesite starost");
+ this.starost = s.nextInt();
+// System.out.println("Unesite adresu");
+// this.adresa = s.nextLine();
+ //this.adresa= s.toString();
+ System.out.println("Unesite platu");
+ this.plata = s.nextInt();
+   }*/
+ 
+}
+
+
