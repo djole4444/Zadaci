@@ -1,0 +1,40 @@
+package javaapplication87;
+
+import java.sql.SQLException;
+import java.util.Scanner;
+
+public class JavaApplication87 {
+    public static void main(String[] args) throws SQLException {
+        Scanner scanner = new Scanner(System.in);
+        
+System.out.println("Unesite opciju:\n1. Prikaz svih zaposlenih\n2. Prikaz zaposlenih po visini plate\n3. Izmena plate\n"
++ "4. Brisanje zaposlenih po id-u\n5. Unos novih zaposlenih");
+        
+        int name = scanner.nextInt();// Scanner scanner
+        Metode m = new Metode();
+        switch(name){
+            case 1:
+                 m.prikazZaposlenih();  
+                break;
+            case 2:
+               System.out.println("Po kojem kriterijumu zelite pregled plata\n"
+                       + "1. Veca od ili\n2. Manja od granicne vrednosti visine plate "); 
+               m.prikazPoKriterijumu(); 
+                break;
+            case 3:
+                 m.izmenaPodataka();  
+               System.out.println("Uspesan unos podataka"); 
+                break;
+            case 4:
+                 m.brisanjeZaposlenih();  
+               System.out.println("Uspesna operacija"); 
+                break;
+            case 5:
+                 m.unosNovih();  
+                break;
+            default:
+                System.out.println("Izabrana opcija nije u ponudi!!!");
+                break;
+        }
+   }
+}
